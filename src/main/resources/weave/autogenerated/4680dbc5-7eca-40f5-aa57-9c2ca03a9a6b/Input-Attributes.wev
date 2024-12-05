@@ -1,0 +1,9 @@
+%dw 2.0
+
+type auto_4680dbc5_7eca_40f5_aa57_9c2ca03a9a6b_Input_Attributes = {|
+  transportAdditionalData?: { _?: String }, 
+  transportHeaders?: { _?: String }
+|} {"typeAlias": "SoapAttributes",
+"class": "com.mulesoft.connector.workday.extension.api.SoapAttributes",
+"typeId": "com.mulesoft.connector.workday.extension.api.SoapAttributes"}
+

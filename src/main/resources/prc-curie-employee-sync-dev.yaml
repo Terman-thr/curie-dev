@@ -1,0 +1,30 @@
+# SFTP Configurations
+sftp:
+  host: "test.net"
+  port: "22"
+  user: "demo"
+  password: "password"
+  InputFileDirectory: "/test"
+  InputFilePattern: "cloudtest*.csv"
+  ArchiveDirectory: "/test/archive"
+# SMTP Email Configurations
+email:
+  host: "smtp.gmail.com"
+  port: "25"
+  fromAddress: "test@test.com"
+  toAddresses: "group@test.com"
+  
+# Oracle Configurations
+oracle:
+  host: "iaas.us-ashburn-1.oraclecloud.com"
+  port: "443"
+  responseTimeout: "300000"
+  user: "user"
+  password: "password"
+  tableHierarchies: "Product,Enterprise,Gregorian Calendar"
+  tableDataHeader: "Item,Organization,Month"
+  tableId: "9002"
+  planId: "300100560600460"
+  
+scheduler:
+  tableUpdatecron: "0 13 * * *"

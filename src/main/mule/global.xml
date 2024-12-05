@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:workday="http://www.mulesoft.org/schema/mule/workday"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	
+		<workday:config name="Workday_Config" doc:name="Workday Config" doc:id="47aa427d-d9a9-4719-b355-c362f4fa4ca4" >
+		<workday:basic-authentication-api-connection tenantName="curie" userName="curieUser" password="password"/>
+	</workday:config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="0454d052-9eb0-478b-8c6c-f84e210e63e4" >
+		<salesforce:basic-connection username="salesUser" password="password" securityToken="token" url="https://login.salesforce.com" />
+	</salesforce:sfdc-config>
+	</mule>
