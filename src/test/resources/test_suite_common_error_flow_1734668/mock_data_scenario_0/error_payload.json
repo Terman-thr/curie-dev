@@ -1,0 +1,14 @@
+{
+  "error": {
+    "exception": {
+      "errorMessage": {
+        "typedAttributes": {
+          "statusCode": "400"
+        },
+        "payload": "Bad Request: Invalid input parameters"
+      }
+    },
+    "errorType": "HTTP:BAD_REQUEST",
+    "detailedDescription": "The request contains invalid parameters"
+  }
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="     http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd     http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd     http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd     http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+  <munit:config name="test_suite_common_error_flow_1734668.xml"/>
+  <munit:test name="test_suite_common_error_flow_0" description="Test the common-errorFlow to ensure it correctly transforms the error payload and logs the error message.">
+    <munit:behavior>
+      <!-- Set up the initial Mule event with an error payload -->
+      <munit:set-event doc:name="Set Event">
+        <munit:payload value="#[MunitTools::getResourceAsString('test_suite_common_error_flow_1734668/mock_data_scenario_0/error_payload.json')]" mediaType="application/json" encoding="UTF-8"/>
+        <munit:variables>
+          <munit:variable key="correlationId" value="12345-abcde-67890-fghij"/>
+        </munit:variables>
+      </munit:set-event>
+      <!-- Spy on the Error Log logger component -->
+      <munit-tools:spy processor="logger" doc:name="Spy Error Log">
+        <munit-tools:with-attributes>
+          <munit-tools:with-attribute whereValue="Error Log" attributeName="doc:name"/>
+        </munit-tools:with-attributes>
+      </munit-tools:spy>
+    </munit:behavior>
+    <munit:execution>
+      <!-- Execute the common-errorFlow -->
+      <flow-ref name="common-errorFlow"/>
+    </munit:execution>
+    <munit:validation>
+      <!-- Verify that the ee:transform component was executed -->
+      <munit-tools:verify-call processor="ee:transform" doc:name="Verify Error Payload Transform" times="1">
+        <munit-tools:with-attributes>
+          <munit-tools:with-attribute whereValue="Error Payload" attributeName="doc:name"/>
+        </munit-tools:with-attributes>
+      </munit-tools:verify-call>
+      <!-- Assert that the payload is not null after transformation -->
+      <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::notNullValue()]" message="Payload should not be null after transformation"/>
+      <!-- Verify that the Error Log logger component was called with the transformed payload -->
+      <munit-tools:verify-call processor="logger" doc:name="Verify Error Log Called" times="1">
+        <munit-tools:with-attributes>
+          <munit-tools:with-attribute whereValue="Error Log" attributeName="doc:name"/>
+        </munit-tools:with-attributes>
+      </munit-tools:verify-call>
+    </munit:validation>
+  </munit:test>
+</mule>
