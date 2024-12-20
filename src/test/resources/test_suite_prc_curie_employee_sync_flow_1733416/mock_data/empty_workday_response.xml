@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns0:Get_Workers_Response xmlns:ns0="urn:com.workday/bsvc">
+    <ns0:Response_Data>
+        <ns0:Workers/>
+    </ns0:Response_Data>
+</ns0:Get_Workers_Response>

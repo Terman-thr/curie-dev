@@ -1,0 +1,71 @@
+<?xml version="1.0" ?>
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="     http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd     http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd     http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd     http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+  <munit:config name="test_suite_prc_curie_employee_sync_flow_1733416.xml"/>
+  <munit:test name="test_suite_prc_curie_employee_sync_flow_1" description="Test the prc-curie-employee-syncFlow with an empty response from Workday">
+    <!-- Behavior section - Mock Workday connector to return empty response -->
+    <munit:behavior>
+      <!-- Mock Workday connector -->
+      <munit-tools:mock-when doc:name="Mock when Get Workers" processor="workday:staffing">
+        <munit-tools:with-attributes>
+          <munit-tools:with-attribute whereValue="get workers" attributeName="doc:name"/>
+        </munit-tools:with-attributes>
+        <munit-tools:then-return>
+          <munit-tools:payload value="#[MunitTools::getResourceAsString('test_suite_prc_curie_employee_sync_flow_1733416/mock_data/empty_workday_response.xml')]" mediaType="application/xml" encoding="UTF-8"/>
+        </munit-tools:then-return>
+      </munit-tools:mock-when>
+      <!-- Mock Salesforce connector -->
+      <munit-tools:mock-when doc:name="Mock Salesforce upsert" processor="salesforce:upsert">
+        <munit-tools:with-attributes>
+          <munit-tools:with-attribute whereValue="Upsert" attributeName="doc:name"/>
+        </munit-tools:with-attributes>
+        <munit-tools:then-return>
+          <munit-tools:payload value="#[null]"/>
+        </munit-tools:then-return>
+      </munit-tools:mock-when>
+      <!-- Mock subflow -->
+      <munit-tools:mock-when doc:name="Mock subflow" processor="flow-ref">
+        <munit-tools:with-attributes>
+          <munit-tools:with-attribute whereValue="prc-curie-employee-syncSub_Flow" attributeName="name"/>
+        </munit-tools:with-attributes>
+        <munit-tools:then-return>
+          <munit-tools:payload value="#[null]"/>
+        </munit-tools:then-return>
+      </munit-tools:mock-when>
+    </munit:behavior>
+    <!-- Execution section - Trigger the flow -->
+    <munit:execution>
+      <try>
+        <munit:set-event doc:name="Set Event">
+          <munit:payload value="#[null]"/>
+        </munit:set-event>
+        <flow-ref doc:name="Flow-ref to prc-curie-employee-syncFlow" name="prc-curie-employee-syncFlow"/>
+        <error-handler>
+          <on-error-continue type="ANY"/>
+        </error-handler>
+      </try>
+    </munit:execution>
+    <!-- Validation section - Verify the expected behavior -->
+    <munit:validation>
+      <!-- Verify Workday connector is called once -->
+      <munit-tools:verify-call doc:name="Verify Get Workers call" processor="workday:staffing" times="1">
+        <munit-tools:with-attributes>
+          <munit-tools:with-attribute whereValue="get workers" attributeName="doc:name"/>
+        </munit-tools:with-attributes>
+      </munit-tools:verify-call>
+      <!-- Verify Salesforce upsert is not called -->
+      <munit-tools:verify-call doc:name="Verify Salesforce upsert not called" processor="salesforce:upsert" times="0"/>
+      <!-- Verify start logger is called -->
+      <munit-tools:verify-call doc:name="Verify Start logger" processor="logger" times="1">
+        <munit-tools:with-attributes>
+          <munit-tools:with-attribute whereValue="Start" attributeName="doc:name"/>
+        </munit-tools:with-attributes>
+      </munit-tools:verify-call>
+      <!-- Verify end logger is called -->
+      <munit-tools:verify-call doc:name="Verify End logger" processor="logger" times="1">
+        <munit-tools:with-attributes>
+          <munit-tools:with-attribute whereValue="End" attributeName="doc:name"/>
+        </munit-tools:with-attributes>
+      </munit-tools:verify-call>
+    </munit:validation>
+  </munit:test>
+</mule>
