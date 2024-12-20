@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns0:Get_Workers_Response xmlns:ns0="urn:com.workday/bsvc">
+  <ns0:Response_Data>
+    <ns0:Workers>
+      <ns0:Worker>
+        <ns0:Worker_ID>W12345</ns0:Worker_ID>
+        <ns0:Personal_Data>
+          <ns0:Name_Data>
+            <ns0:Legal_Name_Data>
+              <ns0:Name_Detail_Data>
+                <ns0:First_Name>John</ns0:First_Name>
+                <ns0:Last_Name>Doe</ns0:Last_Name>
+              </ns0:Name_Detail_Data>
+            </ns0:Legal_Name_Data>
+          </ns0:Name_Data>
+        </ns0:Personal_Data>
+      </ns0:Worker>
+      <ns0:Worker>
+        <ns0:Worker_ID>W67890</ns0:Worker_ID>
+        <ns0:Personal_Data>
+          <ns0:Name_Data>
+            <ns0:Legal_Name_Data>
+              <ns0:Name_Detail_Data>
+                <ns0:First_Name>Jane</ns0:First_Name>
+                <ns0:Last_Name>Smith</ns0:Last_Name>
+              </ns0:Name_Detail_Data>
+            </ns0:Legal_Name_Data>
+          </ns0:Name_Data>
+        </ns0:Personal_Data>
+      </ns0:Worker>
+    </ns0:Workers>
+  </ns0:Response_Data>
+</ns0:Get_Workers_Response>
