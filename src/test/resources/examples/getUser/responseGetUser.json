@@ -1,0 +1,9 @@
+[
+        {
+            "Id": "123",
+            "Username": "john.doe",
+            "EmployeeNumber": "EMP001",
+            "Email": "john.doe@example.com",
+            "Last_Day_of_Work__c": "2023-12-31"
+        }
+    ]

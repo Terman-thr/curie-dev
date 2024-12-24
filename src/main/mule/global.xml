@@ -1,16 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
-	xmlns:workday="http://www.mulesoft.org/schema/mule/workday"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-	http://www.mulesoft.org/schema/mule/workday http://www.mulesoft.org/schema/mule/workday/current/mule-workday.xsd
-http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
-	
-		<workday:config name="Workday_Config" doc:name="Workday Config" doc:id="47aa427d-d9a9-4719-b355-c362f4fa4ca4" >
-		<workday:basic-authentication-api-connection tenantName="curie" userName="curieUser" password="password"/>
-	</workday:config>
-	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="0454d052-9eb0-478b-8c6c-f84e210e63e4" >
-		<salesforce:basic-connection username="salesUser" password="password" securityToken="token" url="https://login.salesforce.com" />
-	</salesforce:sfdc-config>
-	</mule>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:restful-api-properties-provider="http://www.mulesoft.org/schema/mule/restful-api-properties-provider" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:salesforce-composite="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd http://www.mulesoft.org/schema/mule/restful-api-properties-provider http://www.mulesoft.org/schema/mule/restful-api-properties-provider/current/mule-restful-api-properties-provider.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org/schema/mule/salesforce-composite/current/mule-salesforce-composite.xsd">
+    <http:listener-config name="sys-salesforce-api-httpListenerConfig">
+        <http:listener-connection host="${https.host}" port="${https.private.port}"/>
+    </http:listener-config>
+    <apikit:config name="sys-curie-sfdc-upsert-api-config" api="resource::adea24d6-5243-4a4a-a9f0-53a59704b9b7:sys-curie-sfdc-upsert-api:1.0.2:raml:zip:sys-curie-sfdc-upsert-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <configuration-properties doc:name="Configuration properties" doc:id="4b24d5a6-c8ef-498b-9fea-f5671b54e1dc" file="sys-curie-sfdc-upsert-api-${env}.yaml" />
+    <configuration-properties doc:name="Configuration properties" doc:id="b598c967-a9dc-4288-968d-cf3b85e17d3a" file="sys-curie-sfdc-upsert-api-common.yaml" />
+    <secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="b23ddd64-1f4d-4b35-af5b-138fa29abd31" file="secure-sys-curie-sfdc-upsert-api-${env}.yaml" key="${key}" />
+    <salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="43de328c-3977-47eb-a143-986d6477fc1a">
+        <salesforce:jwt-connection consumerKey="${secure::sfdc.consumerKey}" keyStore="${sfdc.keystore.file}" storePassword="${secure::sfdc.keystore.password}" certificateAlias="${sfdc.keystore.alias}" principal="#[vars.sfUserName.peepstg default p('sfdc.defaultUsername')]" tokenEndpoint="${sfdc.tokenUrl}" audienceUrl="${sfdc.audienceUrl}">
+            <reconnection>
+                <reconnect frequency="1000" count="3" />
+            </reconnection>
+        </salesforce:jwt-connection>
+    </salesforce:sfdc-config>
+   
+    <api-gateway:autodiscovery apiId="${api.autodiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="7342dc48-35ce-4ce8-9e4a-a02a01bdbd17" flowRef="sys-curie-sfdc-upsert-api-main" />
+    <ee:object-store-caching-strategy name="Caching_Strategy_User" doc:name="Caching Strategy" doc:id="229b8320-6ab9-4573-8e5c-45b6ec6d1bfa" keyGenerationExpression="#[vars.employeeCacheKey]">
+        <os:private-object-store maxEntries="100" entryTtl="5" entryTtlUnit="MINUTES" expirationIntervalUnit="HOURS" />
+    </ee:object-store-caching-strategy>
+    <salesforce-composite:composite-config name="Salesforce_Composite_Config" doc:name="Salesforce Composite Config" doc:id="b4f4292e-7efc-4a9a-9ab9-029ec269295d">
+        <salesforce-composite:oauth-jwt-connection consumerKey="${secure::sfdc.consumerKey}" keyStore="${sfdc.keystore.file}" storePassword="${secure::sfdc.keystore.password}" certificateAlias="${sfdc.keystore.alias}" principal="#[vars.sfUserName.peepstg default p('sfdc.defaultUsername')]" tokenEndpoint="${sfdc.tokenUrl}" audienceUrl="${sfdc.audienceUrl}" responseTimeout="${sfdc.composite.responseTimeout}" connectionTimeout="${sfdc.composite.connectionTimeout}" />
+    </salesforce-composite:composite-config>
+	<!-- <tls:context name="TLS_Context" doc:name="TLS Context" doc:id="ed07245a-39fa-40c0-bb30-e8bf76104b42" >
+		<tls:key-store type="jks" path="mule_app_cert.jks" keyPassword="${secure::keystore.password}" password="${secure::keystore.password}" />
+	</tls:context> -->
+   
+</mule>

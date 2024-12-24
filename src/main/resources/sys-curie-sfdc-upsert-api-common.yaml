@@ -1,0 +1,22 @@
+
+pcore:
+  sfdc:
+    errorCode: "UNABLE_TO_LOCK_ROW"
+
+sfdc:
+  notificationPath: "/services/data/v50.0/sobjects/chat/"
+  chatPath: "/services/data/v50.0/sobjects/Chat_Data__c/"
+  finalStatus: "Ready"
+  loa:
+    autoAssign: "false"
+  composite:
+    responseTimeout: "60"
+    connectionTimeout: "90"
+
+
+userLookUp:
+   query: "Select Id, Email,last_day_of_work__c, Username From User Where EmployeeNumber = ':employeeId'"
+
+user:
+  profileList: "profile1,profile2,profile3"
+  deleteTable: "user"

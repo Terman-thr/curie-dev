@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:salesforce-composite="http://www.mulesoft.org/schema/mule/salesforce-composite"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org/schema/mule/salesforce-composite/current/mule-salesforce-composite.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<flow name="sf-create-user-provisionFlow" doc:id="a790cce6-9296-47c5-a03e-8bddc42650f4" >
+		<logger level="INFO" doc:name="Start" doc:id="d5061d97-fd66-4e01-9024-866a78054a0c" message='#["createUserProvision  "]'/>
+		<ee:transform doc:name="composite request payload" doc:id="dd2abb93-4e07-4e2b-8c4f-47f187a6c4c9" >
+			<ee:message >
+				<ee:set-payload  resource="dw/curie/createcurieUserRequest.dwl"/>
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="compositeRequest log" doc:id="03305bec-db7c-486f-ad47-7996f963c4f4" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - create user provision request",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger"/>
+		<salesforce-composite:execute-composite-request doc:name="Execute composite request careextern" doc:id="2d0adb00-e096-48a6-bb4a-944c31ce7805" config-ref="Salesforce_Composite_Config"/>
+		<logger level="DEBUG" doc:name="createUserProvision response" doc:id="4f45c873-c76b-41a8-a567-276f73fc073e" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - create user provision response",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger"/>
+		<ee:transform doc:name="response payload" doc:id="1dd3cbc5-5703-49c9-9aa9-495ec910b0e0" >
+			<ee:message >
+				<ee:set-payload  resource="dw/curie/createcurieUserResponse.dwl"/>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="94fade4e-6b71-4bf6-a2ff-1c4fb873930c" message='#["createUserProvision  "]'/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4b55b135-f3ad-4459-9519-a2a4ac198634" >
+				<flow-ref doc:name="common-errorFlow" doc:id="440e1bed-b29a-4eac-8691-f427148317cf" name="common-errorFlow"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="sf-curie-user-patchFlow" doc:id="30d687bb-3881-48bd-9c97-6810f6c2cfae" >
+		<logger level="INFO" doc:name="Start" doc:id="40f800a3-a6ca-47ea-baad-5e65e81be033" message='#["updateUserProvision EmployeeId: "++ (vars.employeeId default "")]'/>
+		<ee:transform doc:name="patch request payload" doc:id="6114b53e-051e-447d-a863-dd3cd6f62308" >
+			<ee:message >
+				<ee:set-payload  resource="dw/curie/updatecurieUserRequest.dwl"/>
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="update user request log" doc:id="6ba759c6-8665-47fc-ae60-44e6be56fec0" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - update user provision request",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger"/>
+		<salesforce-composite:execute-composite-request doc:name="Execute composite patch request" doc:id="cb59b805-3331-4fb3-9741-b6b5ec7d1790" config-ref="Salesforce_Composite_Config"/>
+		<logger level="DEBUG" doc:name="response update user" doc:id="4ac7d499-29c8-4c36-8fb8-63d811ad310a" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - update user provision response",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger"/>
+		<ee:transform doc:name="response" doc:id="83b9f4b0-1e50-4cf4-98ea-99449aaa7c44" >
+			<ee:message >
+				<ee:set-payload  resource="dw/curie/updatecurieUserResponse.dwl"/>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="108dcf9a-d35c-40c6-9b9d-b54cfe26372e" message='#["updateUserProvision EmployeeId: "++ (vars.employeeId default "")]'/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c94264c3-3bd9-4b14-99bb-eee45df0cf29" >
+				<ee:transform doc:name="error payload" doc:id="2a4a9a59-3b95-4284-bccf-27af6d7fabee" >
+					<ee:message >
+						<ee:set-payload  resource="dw/curie/errorPayload.dwl"/>
+					</ee:message>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Error log" doc:id="0e157cdd-3302-43d8-bbe6-d6f1ff155428" message="#[payload]"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	
+	<flow name="sf-curie-user-deleteFlow" doc:id="da49a21c-94a3-4232-b1ac-1df507a12446" >
+		<ee:transform doc:name="employeeId">
+            <ee:variables>
+                <ee:set-variable variableName="employeeId"><![CDATA[attributes.uriParams.'employeeId']]></ee:set-variable>
+				<ee:set-variable variableName="deleteUserTable" ><![CDATA[%dw 2.0
+output application/java
+---
+Mule::p("user.deleteTable")]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<logger level="INFO" doc:name="Start" doc:id="321501b3-2124-4d55-901a-ce1776076b9a" message='#["deleteUserProvision EmployeeId: "++ (vars.employeeId default "")]'/>
+		<choice doc:name="Choice" doc:id="9ae71c38-eb4d-4559-924c-345d42e6742a" >
+			<when expression='#[(vars.deleteUserTable == "user")]'>
+				<ee:transform doc:name="delete request payload" doc:id="555b49d2-db00-461a-9d8e-1bec59d46f09">
+			<ee:message>
+				<ee:set-payload resource="dw/curie/deletecurieUserRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+				<logger level="DEBUG" doc:name="deleteUserProvision request" doc:id="4a06a9e7-4112-4ece-8935-d30e2aca0837" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - delete user provision request",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger" />
+				<salesforce-composite:execute-composite-request doc:name="Execute composite delete request" doc:id="a3c7a10f-5939-40e6-b796-6d7ddf0c7c48" config-ref="Salesforce_Composite_Config" />
+				<logger level="DEBUG" doc:name="deleteUserProvision response" doc:id="4d3c85f8-8f4f-4707-8d74-0ab0fe0e1fa1" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - delete user provision response",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger" />
+				<ee:transform doc:name="user response payload" doc:id="634c8c63-e88e-45f9-b4c6-21867175c777">
+			<ee:message>
+				<ee:set-payload resource="dw/curie/deletecurieUserResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+			</when>
+			<when expression='#[(vars.deleteUserTable == "userStaging")]' >
+				<flow-ref doc:name="sf-curie-user-provision-deleteStagingFlow" doc:id="ef9c90c1-0db7-4035-b313-19355cb62cd6" name="sf-curie-user-provision-deleteStagingFlow"/>
+			</when>
+			<otherwise >
+			   <ee:transform doc:name="default no action response payload" doc:id="ec3ca33b-ff4a-407c-ad77-cb466817552d">
+			<ee:message>
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json 
+---
+{
+  status:  "Success" ,
+  statusCode:  "200" ,
+  description:  "User (EmployeeId: " ++ (vars.employeeId default "") ++ ") no action on SF",
+  source: "curie",
+  (responsePayload: {
+    "messageList": 
+      {
+        "employeeId":  vars.employeeId
+      }
+  }) 
+}]]></ee:set-payload>
+				
+			</ee:message>
+			</ee:transform>
+				<logger level="INFO" doc:name="No Action" doc:id="4d903c34-10ea-4974-b175-dd0e070b8b5f" message="#[payload]" />
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="End" doc:id="a5eaf439-475b-4a8b-a031-5728b9909c49" message='#["deleteUserProvision EmployeeId: "++ (vars.employeeId default "")]'/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c2f0dadd-5273-4a25-ac1f-cc8dcbb4fcd6" >
+				<ee:transform doc:name="error payload" doc:id="bfba1185-6ce7-4e8f-9291-e70182cd585a" >
+					<ee:message >
+						<ee:set-payload  resource="dw/curie/errorPayload.dwl"/>
+					</ee:message>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Error log" doc:id="bbc819e4-41aa-4f49-9b42-2db352457fff" message="#[payload]"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="sf-curie-user-provision-deleteStagingFlow" doc:id="ee79bd8e-a8e9-433d-83f0-d7dfa5dd4a38" >
+		<ee:transform doc:name="delete request payload" doc:id="0a08af0e-d4c4-492e-af73-34791e104e8f">
+			<ee:message>
+				<ee:set-payload resource="dw/curie/deletecurieUserStagingRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="deleterStaging request" doc:id="9897cff9-6a50-4c6b-b20c-d6bb406b0fb6" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - delete user provision request",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger" />
+		<salesforce-composite:execute-composite-request doc:name="Execute composite delete staging request" doc:id="456dc294-3b6e-45f7-bee2-6351b9abeb19" config-ref="Salesforce_Composite_Config" />
+		<logger level="DEBUG" doc:name="deleteUserStagingProvision response" doc:id="7fd18a8b-a87b-47fb-bf83-f13332204425" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - delete user provision response",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger" />
+		<ee:transform doc:name="user Staging response payload" doc:id="06461fde-ba81-4063-bbcc-1273dcd54254">
+			<ee:message>
+				<ee:set-payload resource="dw/curie/deletecurieUserStagingResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="sf-curie-user-GetFlow" doc:id="4a8e0d0d-922e-408b-8e5f-4741810948e2" >
+		<ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="employeeId">attributes.uriParams.'employeeId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<logger level="INFO" doc:name="Start" doc:id="6e283a4c-c615-4364-aab2-42e1a4e06a12" message='#["getUserProvision EmployeeId: "++ (vars.employeeId default "")]'/>
+		<ee:transform doc:name="get request" doc:id="bb86ab2d-4c6e-40de-bada-b5d8c2f7aed1" >
+			<ee:message >
+				<ee:set-payload  resource="dw/curie/getcurieUserRequest.dwl"/>
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="getUserProvision request" doc:id="9aaeefb7-0cc0-47c2-81f9-1189bb805de1" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - get user provision request",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger"/>
+		<salesforce-composite:execute-composite-request doc:name="Execute composite get request" doc:id="a18b4567-1d06-4ba0-bff5-f3537982ca3c" config-ref="Salesforce_Composite_Config"/>
+		
+		<logger level="DEBUG" doc:name="getUserProvision response" doc:id="745c9339-151e-4f5c-9e8c-3e881044b93f" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - get user provision response",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger"/>
+		<ee:transform doc:name="response get" doc:id="603f55ca-e768-440d-921c-95f3a0ff0fe1" >
+			<ee:message >
+				<ee:set-payload  resource="dw/curie/getcurieUserResponse.dwl"/>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="b80fac43-aaea-4cb4-b9bb-b7964e9bbfcb" message='#["getUserProvision EmployeeId: "++ (vars.employeeId default "")]'/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7910378a-a95b-4e64-ac32-abf6281ed827" >
+				<ee:transform doc:name="Error Payload" doc:id="0c2b3ff6-8a58-45d5-b758-71c85cb169cf" >
+					<ee:message >
+						<ee:set-payload  resource="dw/curie/errorPayload.dwl"/>
+					</ee:message>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Error Log" doc:id="717f0f08-9167-43c7-b0ce-4113d8381574" message="#[payload]"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

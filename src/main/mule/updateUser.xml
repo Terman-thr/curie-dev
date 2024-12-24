@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<flow name="updateUserFlow" doc:id="ce215cfc-781c-464a-b862-9f83300ef6e3" >
+		<logger level="INFO" doc:name="Start" doc:id="bbc6b957-d425-4b97-8fa4-ea5208238fac" message="#[payload]"/>
+		<ee:transform doc:name="request" doc:id="290a2b92-07f4-4fa3-aa19-e914b569460e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import first from dw::core::Strings
+output application/java
+---
+{
+	FullName: payload.firstName ++ " " ++ payload.lastName ,
+	Email: payload.email,
+	externalId: payload.accountId,
+	userId: (payload.firstName first 1) ++  payload.lastName
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:update type="accountId" doc:name="Update" doc:id="2c7e8cfa-39fb-4744-9979-79859b7e7485" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="response in json" doc:id="8c5dcbe7-c443-43a9-beef-1c41c3feb27f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End" doc:id="2dcee591-9949-4667-988c-8868b168a20c" message="#[payload]"/>
+		<error-handler ref="common-api-flowsError_Handler" />
+	</flow>
+</mule>

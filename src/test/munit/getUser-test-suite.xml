@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="getUser-test-suite.xml" />
+	<munit:test name="getUser-test-suite-get:\user\(employeeId):sys-curie-sfdc-upsert-api-configTest" doc:id="cfd58903-1fd2-43c2-b3d2-40c62a5baa0c" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when salesforce request" doc:id="2883dc50-9d7f-4821-9ba3-2cdff3bf8b37" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Query" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="Salesforce_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[read("/examples/getUser/responseGetUser.json","application/json")]' mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="f0bf29bd-0484-48db-867c-f09fa3d98c41" >
+				<munit:attributes value='#[{"uriParams": {"employeeId": "345345"}}]' encoding="UTF-8" mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to get:\user\(employeeId):sys-curie-sfdc-upsert-api-config" doc:id="27d90dfe-a6b4-4f28-8f2c-26c739d068bd" name="get:\user\(employeeId):sys-curie-sfdc-upsert-api-config"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="32d4a50c-e6cc-458d-a664-e44d7402b82d" actual="#[payload.status]" expected='#["Success"]' message='#["executed successfully"]'/>
+		</munit:validation>
+	</munit:test>
+
+</mule>

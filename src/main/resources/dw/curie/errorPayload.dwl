@@ -4,6 +4,7 @@ output application/json
 {
   status: "Failure",
   statusCode: error.exception.errorMessage.typedAttributes.statusCode default "500",
+  source: "Salesforce",
   "correlationId": vars.correlationId,
   errorType: error.errorType.asString,
   errorPayload: {

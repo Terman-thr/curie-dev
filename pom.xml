@@ -1,41 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.mycompany</groupId>
-	<artifactId>prc-curie-employee-sync</artifactId>
+	<groupId>curieTech</groupId>
+	<artifactId>sys-curie-sfdc-upsert-api</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>mule-application</packaging>
 
-	<name>prc-curie-employee-sync</name>
+	<name>sys-curie-sfdc-upsert-api</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <munit.version>2.3.14</munit.version>
-		<app.runtime>4.6.1</app.runtime>
+		<app.runtime>4.4.0</app.runtime>
 		<mule.maven.plugin.version>4.1.0</mule.maven.plugin.version>
+		<munit.version>2.3.14</munit.version>
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
+		<tags>System,Salesforce</tags>
 	</properties>
 
 	<build>
+<!-- 		<finalName>${project.artifactId}-${timestamp}</finalName> -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>src/test/resources</directory>
+				<includes>
+					<include>**/*.yaml</include>
+					<include>**/*.p12</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.0.0</version>
 			</plugin>
 			<plugin>
 				<groupId>org.mule.tools.maven</groupId>
 				<artifactId>mule-maven-plugin</artifactId>
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
+				<configuration>
+					<param>${project.build.finalName}</param>
+					<cloudHubDeployment>
+						<uri>https://anypoint.mulesoft.com</uri>
+						<muleVersion>${app.runtime}</muleVersion>
+						<username>CurieTechServiceUser</username>
+						<password>${ANYPOINT_SERVICE_PWD}</password>
+						<applicationName>${env}-${project.artifactId}</applicationName>
+						<environment>${deployEnv}</environment>
+						<region>${awsRegion}</region>
+						<workerType>${workerType}</workerType>
+						<workers>${workers}</workers>
+						<objectStoreV2>true</objectStoreV2>
+						<deploymentTimeout>2000000</deploymentTimeout>
+						<businessGroupId>${businessGroupId}</businessGroupId>
+						<properties>
+							<key>${key}</key>
+							<env>${env}</env>
+							<anypoint.platform.client_id>${clientId}</anypoint.platform.client_id>
+							<anypoint.platform.config.analytics.agent.enabled>true</anypoint.platform.config.analytics.agent.enabled>
+							<anypoint.platform.client_secret>${secret}</anypoint.platform.client_secret>
+						</properties>
+					</cloudHubDeployment>
+					<classifier>mule-application</classifier>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>com.mulesoft.munit.tools</groupId>
 				<artifactId>munit-maven-plugin</artifactId>
-				<version>${munit.version}</version>	
+				<version>${munit.version}</version>
 				<executions>
 					<execution>
 						<id>test</id>
@@ -49,15 +88,14 @@
 				<configuration>
 					<environmentVariables>
 						<env>munit</env>
-						<key>abcdefghij123456</key>
+						<key>1234546789</key>
 						<environment.id>DEV</environment.id>
 						<domain>dev</domain>
 					</environmentVariables>
 					<coverage>
-						<ignoreFiles>
-							<ignoreFile>global.xml</ignoreFile>
-						</ignoreFiles>
 						<ignoreFlows>
+							<ignoreFlow>sys-fb-pcor-sfdc-upsert-api-main</ignoreFlow>
+							<ignoreFlow>sys-fb-pcor-sfdc-upsert-api-console</ignoreFlow>
 						</ignoreFlows>
 						<runCoverage>true</runCoverage>
 						<failBuild>false</failBuild>
@@ -67,9 +105,6 @@
 							<format>json</format>
 							<format>sonar</format>
 						</formats>
-						<requiredApplicationCoverage>70</requiredApplicationCoverage>
-						<requiredResourceCoverage>70</requiredResourceCoverage>
-						<requiredFlowCoverage>70</requiredFlowCoverage>
 					</coverage>
 				</configuration>
 			</plugin>
@@ -79,35 +114,81 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-http-connector</artifactId>
-			<version>1.9.1</version>
+			<artifactId>mule-sockets-connector</artifactId>
+			<version>1.1.6</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+
+		<dependency>
+			<groupId>com.mulesoft.modules</groupId>
+			<artifactId>mule-secure-configuration-property-module</artifactId>
+			<version>1.2.3</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-sockets-connector</artifactId>
-			<version>1.2.4</version>
+			<artifactId>mule-objectstore-connector</artifactId>
+			<version>1.1.6</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>com.mulesoft.connectors</groupId>
-			<artifactId>mule-workday-connector</artifactId>
-			<version>16.0.2</version>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-validation-module</artifactId>
+			<version>1.4.5</version>
 			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.munit</groupId>
+			<artifactId>munit-runner</artifactId>
+			<version>2.3.14</version>
+			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.munit</groupId>
+			<artifactId>munit-tools</artifactId>
+			<version>2.3.14</version>
+			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.mulesoft.connectors</groupId>
 			<artifactId>mule-salesforce-connector</artifactId>
-			<version>10.20.0</version>
+			<version>10.14.6</version>
 			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-apikit-module</artifactId>
+			<version>1.8.1</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-http-connector</artifactId>
+			<version>1.7.3</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.connectors</groupId>
+			<artifactId>mule-salesforce-composite-connector</artifactId>
+			<version>2.14.0</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+				<dependency>
+			<groupId>adea24d6-5243-4a4a-a9f0-53a59704b9b7</groupId>
+			<artifactId>sys-curie-sfdc-upsert-api</artifactId>
+			<version>1.0.2</version>
+			<classifier>raml</classifier>
+			<type>zip</type>
 		</dependency>
 	</dependencies>
 
 	<repositories>
 		<repository>
-			<id>anypoint-exchange-v3</id>
+			<id>anypoint-exchange-v2</id>
 			<name>Anypoint Exchange</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v2/maven</url>
 			<layout>default</layout>
 		</repository>
 		<repository>
@@ -116,12 +197,17 @@
 			<url>https://repository.mulesoft.org/releases/</url>
 			<layout>default</layout>
 		</repository>
+		<repository>
+			<id>anypoint-exchange-v3</id>
+			<name>Anypoint Exchange V3</name>
+			<url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
+			<layout>default</layout>
+		</repository>
 	</repositories>
-
 	<pluginRepositories>
 		<pluginRepository>
 			<id>mulesoft-releases</id>
-			<name>MuleSoft Releases Repository</name>
+			<name>mulesoft release repository</name>
 			<layout>default</layout>
 			<url>https://repository.mulesoft.org/releases/</url>
 			<snapshots>

@@ -1,0 +1,45 @@
+https:
+  host: "0.0.0.0"
+  private:
+    port: "8092"
+  
+api:
+  path: "/api/v1/*"
+  autodiscovery: "19559546"
+  name: sys-curie-sfdc-upsert-api
+
+mule:
+  env: "dev"
+
+
+
+sfdc:
+  username: "mulesoftint"
+  defaultUsername: "mulesoftint"   
+  url: "https://test.salesforce.com/services/Soap/u/49.0"
+  audienceUrl: "https://test.salesforce.com"
+  tokenUrl: "https://test.salesforce.com/services/oauth2/token"
+  keystore:
+    file: "mule-care-extern-cert.jks"
+    alias: "mule_user_connected_app"
+  errorCode: "UNABLE_TO_LOCK_ROW"
+  urlREST:
+    sobject: "/services/data/v53.0/sobjects/"
+    query: "/services/data/v53.0/query/?q="
+  
+untilSuccess:
+  max:
+    retries: "3"
+  milliseconds:
+    betweenRetries: "1000"
+
+sobject:
+  user:
+    role: "00EDn000000DWt6MAG"  
+    emailEncodingKey: "UTF-8"
+    localeSidKey: "en_US"
+    languageLocaleKey: "en_US"
+    
+    
+     
+   

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<flow name="lookupUserFlow" doc:id="3d237e20-f207-4b1f-bf75-f12c4b5b0ade" >
+		<ee:cache doc:name="Cache" doc:id="e3a190cf-13e2-4220-af66-f353ad043efc" cachingStrategy-ref="Caching_Strategy_User" filterExpression="#[attributes.headers.'cache-control' != 'no-cache']">
+			<ee:transform doc:name="vars.processDefQuery" doc:id="70105e3f-b7e8-4ead-95c8-cdbbb01b3722">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="employeeId"><![CDATA[%dw 2.0
+output application/json
+---
+if(attributes.uriParams.employeeId?) attributes.uriParams.employeeId else vars.orginalPayload.employeeId]]></ee:set-variable>
+				<ee:set-variable variableName="userQuery"><![CDATA[%dw 2.0
+output application/java
+var userLookUpQuery= Mule::p('userLookUp.query')
+---
+userLookUpQuery]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="7d9b99a5-5b2f-48fd-aba1-38dcbb6cb891" message="User lookup for id: #[vars.employeeId]" />
+			<salesforce:query doc:name="Query" doc:id="a7a4c285-37e2-4018-aef1-e35f321dda4c" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query><![CDATA[#[vars.userQuery]]]></salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	employeeId : vars.employeeId
+}]]]></salesforce:parameters>
+		</salesforce:query>
+			<ee:transform doc:name="buildResponse" doc:id="e9e83ccf-7254-4d76-8c10-b00a8533ec12">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+var payloadSize = sizeOf(payload default [])
+---
+{
+	
+  "errorType": "",
+  "source": "SFDC",
+  "errorPayload": {},
+  "statusCode": if(payloadSize > 0) "200" else "400",
+  "responsePayload": {
+    "id": payload[0].Id,
+    "username": payload[0].Username,
+    "employeeId": payload[0].EmployeeNumber,
+    "email": payload[0].Email,
+    "lastDayOfWork": payload[0].Last_Day_of_Work__c
+  },
+  "description": if(payloadSize > 0) "Request processed successfully" else "User not found in Salesforce",
+  "status": if(payloadSize > 0) "Success" else "Failure"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		</ee:cache>
+		<error-handler ref="common-api-flowsError_Handler" />
+	</flow>
+</mule>

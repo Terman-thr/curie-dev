@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+    <flow name="sys-curie-sfdc-upsert-api-main">
+        <http:listener config-ref="sys-salesforce-api-httpListenerConfig" path="${api.path}">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <set-variable value="#[payload]" doc:name="Set originalPayload" doc:id="1cafd89c-4fbc-401f-ab90-bfc4a1f7d09f" variableName="originalPayload" />
+        <set-variable value="#[vars.transactionProperties.correlationId]" doc:name="correlationId" doc:id="21f6b61e-6a44-4368-ac0a-df7b532fba17" variableName="correlationId" />
+       <flow-ref doc:name="Get SF UserName" doc:id="2e960cef-c8d6-4bf7-ba34-dd67ef7c80e2" name="getSfUserName" />
+        <apikit:router config-ref="sys-curie-sfdc-upsert-api-config" />
+    </flow>
+    <flow name="sys-curie-sfdc-upsert-api-console">
+        <http:listener config-ref="sys-salesforce-api-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="sys-curie-sfdc-upsert-api-config" />
+    </flow>
+    
+   
+    
+    <flow name="get:\user\(employeeId):sys-curie-sfdc-upsert-api-config" doc:id="673c0bc2-96b7-4b00-bf91-de1e37e17882">
+        <set-variable value="#[attributes.uriParams.'employeeId']" doc:name="employeeCacheKey" doc:id="b02961a6-d896-489c-96a2-c1d74d04893c" variableName="employeeCacheKey" />
+        <flow-ref doc:name="Call lookupUserFlow" doc:id="01be723c-3204-4175-b07d-d29d7484a28a" name="lookupUserFlow" />
+    </flow>
+
+  
+  
+  
+   
+   
+   
+    
+    <flow name="post:\user\provision:application\json:sys-curie-sfdc-upsert-api-config">
+        <flow-ref doc:name="sf-create-user-provisionFlow" doc:id="4fecb212-47a5-4a2c-a9f7-b91a9d21277b" name="sf-create-user-provisionFlow" />
+    </flow>
+    <flow name="delete:\user\provision\(employeeId):sys-curie-sfdc-upsert-api-config">
+        <flow-ref doc:name="sf-curie-user-deleteFlow" doc:id="4cbe6164-d357-4b1e-adfe-3a0bd5959d53" name="sf-curie-user-deleteFlow" />
+    </flow>
+    <flow name="patch:\user\provision\(employeeId):application\json:sys-curie-sfdc-upsert-api-config">
+        <flow-ref doc:name="sf-curie-user-patchFlow" doc:id="61cc68a2-996a-4444-b586-e87597c803a3" name="sf-curie-user-patchFlow" />
+    </flow>
+    <flow name="get:\user\provision\(employeeId):sys-curie-sfdc-upsert-api-config">
+        <flow-ref doc:name="sf-curie-user-GetFlow" doc:id="23ab5499-55e3-4b32-80e9-427d437b7172" name="sf-curie-user-GetFlow" />
+    </flow>
+   
+   
+</mule>
