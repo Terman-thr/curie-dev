@@ -21,6 +21,7 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 				<ee:set-payload  resource="dw/curie/createcurieUserResponse.dwl"/>
 			</ee:message>
 		</ee:transform>
+		<logger level="DEBUG" doc:name="Order Placed Log" doc:id="e292f624-334a-470c-a8ea-098e632b4311" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "ORDER PLACED: User provision order has been placed successfully",&#10;	"orderDetails": {&#10;		"employeeId": payload.responsePayload.employeeId,&#10;		"username": payload.responsePayload.username,&#10;		"email": payload.responsePayload.email,&#10;		"status": payload.status,&#10;		"description": payload.description&#10;	}&#10;}]' category="com.curie.debug.logger"/>
 		<logger level="INFO" doc:name="End" doc:id="94fade4e-6b71-4bf6-a2ff-1c4fb873930c" message='#["createUserProvision  "]'/>
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4b55b135-f3ad-4459-9519-a2a4ac198634" >
@@ -82,6 +83,7 @@ Mule::p("user.deleteTable")]]></ee:set-variable>
 				<ee:set-payload resource="dw/curie/deletecurieUserResponse.dwl" />
 			</ee:message>
 		</ee:transform>
+				<logger level="DEBUG" doc:name="Order Canceled Log" doc:id="d13792c7-931e-4b01-a560-ff1ee7f3a52b" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "ORDER CANCELED: User provision order has been canceled",&#10;	"orderDetails": {&#10;		"employeeId": vars.employeeId,&#10;		"status": payload.status,&#10;		"description": payload.description,&#10;		"responsePayload": payload.responsePayload&#10;	}&#10;}]' category="com.curie.debug.logger"/>
 			</when>
 			<when expression='#[(vars.deleteUserTable == "userStaging")]' >
 				<flow-ref doc:name="sf-curie-user-provision-deleteStagingFlow" doc:id="ef9c90c1-0db7-4035-b313-19355cb62cd6" name="sf-curie-user-provision-deleteStagingFlow"/>
