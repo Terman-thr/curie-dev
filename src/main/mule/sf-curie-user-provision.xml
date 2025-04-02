@@ -131,6 +131,7 @@ output application/json
 		<logger level="DEBUG" doc:name="deleterStaging request" doc:id="9897cff9-6a50-4c6b-b20c-d6bb406b0fb6" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - delete user provision request",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger" />
 		<salesforce-composite:execute-composite-request doc:name="Execute composite delete staging request" doc:id="456dc294-3b6e-45f7-bee2-6351b9abeb19" config-ref="Salesforce_Composite_Config" />
 		<logger level="DEBUG" doc:name="deleteUserStagingProvision response" doc:id="7fd18a8b-a87b-47fb-bf83-f13332204425" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - delete user provision response",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger" />
+		<logger level="DEBUG" doc:name="Order Staging Canceled Log" doc:id="95260d00-4a55-49e1-b1f3-b8512ee50db8" message="#[output application/json --- readUrl('classpath://dw/curie/orderStagingCanceledLog.dwl')]" category="com.curie.debug.logger" />
 		<ee:transform doc:name="user Staging response payload" doc:id="06461fde-ba81-4063-bbcc-1273dcd54254">
 			<ee:message>
 				<ee:set-payload resource="dw/curie/deletecurieUserStagingResponse.dwl" />
@@ -153,6 +154,7 @@ output application/json
 		<salesforce-composite:execute-composite-request doc:name="Execute composite get request" doc:id="a18b4567-1d06-4ba0-bff5-f3537982ca3c" config-ref="Salesforce_Composite_Config"/>
 		
 		<logger level="DEBUG" doc:name="getUserProvision response" doc:id="745c9339-151e-4f5c-9e8c-3e881044b93f" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "curie - get user provision response",&#10;	"request": payload&#10;}]' category="com.curie.debug.logger"/>
+		<logger level="DEBUG" doc:name="Order Retrieved Log" doc:id="8a74edf1-9047-4aaf-bdbe-207f60a6a286" message="#[output application/json --- readUrl('classpath://dw/curie/orderRetrievedLog.dwl')]" category="com.curie.debug.logger"/>
 		<ee:transform doc:name="response get" doc:id="603f55ca-e768-440d-921c-95f3a0ff0fe1" >
 			<ee:message >
 				<ee:set-payload  resource="dw/curie/getcurieUserResponse.dwl"/>
