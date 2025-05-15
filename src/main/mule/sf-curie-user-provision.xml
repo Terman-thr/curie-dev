@@ -57,16 +57,23 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 	</flow>
 	
 	<flow name="sf-curie-user-deleteFlow" doc:id="da49a21c-94a3-4232-b1ac-1df507a12446" >
-		<ee:transform doc:name="employeeId">
+		<ee:transform doc:name="Set Variables" doc:id="f3f4f059-cd11-48bb-8174-272507a9ef6f">
             <ee:variables>
                 <ee:set-variable variableName="employeeId"><![CDATA[attributes.uriParams.'employeeId']]></ee:set-variable>
 				<ee:set-variable variableName="deleteUserTable" ><![CDATA[%dw 2.0
 output application/java
 ---
-Mule::p("user.deleteTable")]]></ee:set-variable>
+p('user.deleteTable')]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-		<logger level="INFO" doc:name="Start" doc:id="321501b3-2124-4d55-901a-ce1776076b9a" message='#["deleteUserProvision EmployeeId: "++ (vars.employeeId default "")]'/>
+		<logger level="INFO" doc:name="Start" doc:id="321501b3-2124-4d55-901a-ce1776076b9a" message='#[%dw 2.0
+output application/json
+---
+{
+	"correlationId": vars.correlationId,
+	"message": "curie - delete user provision start",
+	"employeeId": vars.employeeId default ""
+}]' category="com.curie.debug.logger"/>
 		<choice doc:name="Choice" doc:id="9ae71c38-eb4d-4559-924c-345d42e6742a" >
 			<when expression='#[(vars.deleteUserTable == "user")]'>
 				<ee:transform doc:name="delete request payload" doc:id="555b49d2-db00-461a-9d8e-1bec59d46f09">
@@ -110,15 +117,17 @@ output application/json
 				<logger level="INFO" doc:name="No Action" doc:id="4d903c34-10ea-4974-b175-dd0e070b8b5f" message="#[payload]" />
 			</otherwise>
 		</choice>
-		<logger level="INFO" doc:name="End" doc:id="a5eaf439-475b-4a8b-a031-5728b9909c49" message='#["deleteUserProvision EmployeeId: "++ (vars.employeeId default "")]'/>
+		<logger level="INFO" doc:name="End" doc:id="a5eaf439-475b-4a8b-a031-5728b9909c49" message='#[%dw 2.0
+output application/json
+---
+{
+	"correlationId": vars.correlationId,
+	"message": "curie - delete user provision end",
+	"employeeId": vars.employeeId default ""
+}]' category="com.curie.debug.logger"/>
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c2f0dadd-5273-4a25-ac1f-cc8dcbb4fcd6" >
-				<ee:transform doc:name="error payload" doc:id="bfba1185-6ce7-4e8f-9291-e70182cd585a" >
-					<ee:message >
-						<ee:set-payload  resource="dw/curie/errorPayload.dwl"/>
-					</ee:message>
-				</ee:transform>
-				<logger level="ERROR" doc:name="Error log" doc:id="bbc819e4-41aa-4f49-9b42-2db352457fff" message="#[payload]"/>
+				<flow-ref doc:name="common-errorFlow" doc:id="440e1bed-b29a-4eac-8691-f427148317cf" name="common-errorFlow"/>
 			</on-error-propagate>
 		</error-handler>
 	</flow>
@@ -161,12 +170,7 @@ output application/json
 		<logger level="INFO" doc:name="End" doc:id="b80fac43-aaea-4cb4-b9bb-b7964e9bbfcb" message='#["getUserProvision EmployeeId: "++ (vars.employeeId default "")]'/>
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7910378a-a95b-4e64-ac32-abf6281ed827" >
-				<ee:transform doc:name="Error Payload" doc:id="0c2b3ff6-8a58-45d5-b758-71c85cb169cf" >
-					<ee:message >
-						<ee:set-payload  resource="dw/curie/errorPayload.dwl"/>
-					</ee:message>
-				</ee:transform>
-				<logger level="ERROR" doc:name="Error Log" doc:id="717f0f08-9167-43c7-b0ce-4113d8381574" message="#[payload]"/>
+				<flow-ref doc:name="common-errorFlow" doc:id="440e1bed-b29a-4eac-8691-f427148317cf" name="common-errorFlow"/>
 			</on-error-propagate>
 		</error-handler>
 	</flow>
